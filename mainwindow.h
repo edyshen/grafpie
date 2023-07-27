@@ -20,5 +20,6 @@ public:
 private:
     Ui::MainWindow *ui;
     Wallet* _wal;
+    void configuration();
 };
 #endif // MAINWINDOW_H

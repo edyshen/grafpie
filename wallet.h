@@ -37,6 +37,7 @@ private:
     double kof;
     double sel_rad;
 
+
 };
 
 #endif // WALLET_H

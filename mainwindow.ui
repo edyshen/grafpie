@@ -31,7 +31,7 @@
      <rect>
       <x>9</x>
       <y>9</y>
-      <width>501</width>
+      <width>491</width>
       <height>461</height>
      </rect>
     </property>
@@ -44,7 +44,7 @@
      </property>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>550</x>
@@ -57,7 +57,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="l_token">
          <property name="text">
           <string>Token</string>
          </property>
