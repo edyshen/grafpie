@@ -47,10 +47,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>510</x>
       <y>10</y>
-      <width>291</width>
-      <height>451</height>
+      <width>351</width>
+      <height>461</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -102,21 +102,17 @@
       </layout>
      </item>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
-       <property name="widgetResizable">
-        <bool>true</bool>
+      <widget class="QLabel" name="label_sum_tok">
+       <property name="text">
+        <string/>
        </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>287</width>
-          <height>356</height>
-         </rect>
-        </property>
-       </widget>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="list_token"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">

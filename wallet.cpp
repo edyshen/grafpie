@@ -17,35 +17,57 @@ Wallet::Wallet(QWidget *parent) :
     wall tmp;
     tmp.vol = 10;
 
-    for(int i = 0 ; i < 5 ; i++)  // для примера наберем ряд значений
-    {
-        l_total_wall.append(tmp);
-        tmp.vol += 10;
-    }
-    calculate();
 
+
+}
+void Wallet::sel_tok(const QString &tok)    // ВЫДЕЛЕНИЕ СЕГМЕНТА ПО ЗАПРОСУ СПИСКА!!!!!
+{
+    //////////////////////// ДОПИЛИТЬ!
 }
 void Wallet::add_token(wall &tok)
 {
     l_total_wall.append(tok);
-    update();
+    calculate();
+    this->update();
 }
 void Wallet::mouseMoveEvent(QMouseEvent *event)
 {
     this->update();
 }
-
+void Wallet::del_token(const QString &tok)
+{
+    for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i++)
+    {
+        if(i->name == tok)
+        {
+            l_total_wall.erase(i);
+            break;
+        }
+    }
+    calculate();
+    this->update();
+}
+double Wallet::get_sum_token(const QString &tok)
+{
+    for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i++)
+    {
+        if(i->name == tok)
+        {
+            return i->vol;
+        }
+    }
+    return 0;
+}
 void Wallet::paintEvent(QPaintEvent *event)
 {
     QPainter wall(this);
-    wall.setBrush(Qt::red);    
     int ws = this->width();
     int hs = this->height();
     QPen pen;
     wall.setPen(pen);
     pen.setWidth(0);
-    pen.setColor(Qt::darkBlue);
-    QRectF pie (0,0, ws, hs);  // Размер Круга графика!
+
+    QRectF pie (ws / 8, hs / 8, ws - (ws/8) *2, hs - (hs /8)*2);  // Размер Круга графика!
     int zerox = int(pie.center().x());
     int zeroy = int(pie.center().y());
     int xRad = int(pie.width() / 2);
@@ -111,18 +133,25 @@ void Wallet::paintEvent(QPaintEvent *event)
         rate_ += int(std::round(i->scal_vol));
         if(in_diapazon(rate, rate_, sel))
         {
-            pen.setWidth(0);
+            pen.setColor(Qt::red);
+            pen.setWidth(2);
             wall.setPen(pen);
-            wall.setBrush(Qt::green);
+            wall.setBrush(Qt::white);
             wall.drawPie(pie, rate * 16 , int(std::round(i->scal_vol) * 16));
         }else
         {
-            wall.setBrush(Qt::red);
+            pen.setWidth(0);
+            pen.setColor(Qt::black);
+            wall.setPen(pen);
+            wall.setBrush(QColor(255,55,150));
             wall.drawPie(pie, rate * 16 , int(std::round(i->scal_vol) * 16));
         }
         rate = rate_;
     }
-    sel = -1;
+}
+const QList<wall>* Wallet::take_list_token()
+{
+    return &l_total_wall;
 }
 
 void Wallet::calculate()
@@ -131,14 +160,12 @@ void Wallet::calculate()
     for(int i = 0; i < l_total_wall.size(); i++)
     {
         kof =  l_total_wall.at(i).vol + kof;
-        qDebug() << kof << "!";
     }
     kof = 360 / kof;
-    qDebug() << kof;
+
     for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i++)
     {
         i->scal_vol = i->vol * kof;
-        qDebug() << i->scal_vol;
     }
 
 }

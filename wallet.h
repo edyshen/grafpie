@@ -8,7 +8,7 @@
 
 struct wall
 {
-    char name[4]{'n','u','l','l'};
+    QString name;
     double vol = 0;
     double scal_vol = 0;
 };
@@ -24,6 +24,10 @@ class Wallet : public QWidget
 public:
     explicit Wallet(QWidget *parent = nullptr);
     void add_token(wall &tok);
+    void del_token(const QString& tok);
+    const QList<wall>* take_list_token();
+    double get_sum_token(const QString& tok);
+    void sel_tok(const QString& tok);
     ~Wallet();
 
 private:
