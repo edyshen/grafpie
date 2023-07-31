@@ -16,23 +16,53 @@ Wallet::Wallet(QWidget *parent) :
     l_total_wall.clear();
     wall tmp;
     tmp.vol = 10;
-
-
-
 }
-void Wallet::sel_tok(const QString &tok)    // ВЫДЕЛЕНИЕ СЕГМЕНТА ПО ЗАПРОСУ СПИСКА!!!!!
+void Wallet::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //////////////////////// ДОПИЛИТЬ!
+    detect_pos();
+    if(sel != -1)
+    {
+        int frst = 0;
+        int fend = 0;
+        for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i++)
+        {
+            fend += int(std::round(i->scal_vol));
+            if(in_diapazon(frst,fend,sel))
+            {
+                if(i->targ == false)
+                {
+                    i->targ = true;
+                    emit target_piece(i->name, i->targ);
+                }else
+                {
+                    i->targ = false;
+                    emit target_piece(i->name, i->targ);
+                }
+            }
+            frst = fend;
+        }
+        this->update();
+    }
 }
-void Wallet::add_token(wall &tok)
+
+void Wallet::add_token(wall &tok)  ////РАБОТАЕТ НЕ ПРАВИЛЬНО! ДОПИЛИТЬ!!! подсчитывает только колличество токенов
 {
+    for(QList<wall>::iterator i = l_total_wall.begin(); i < l_total_wall.end(); i++)
+    {
+        if(i->name == tok.name)
+        {
+            qDebug() << i->vol;
+            i->vol += tok.vol;
+            qDebug() << i->vol;
+            return;
+        }
+    }
     l_total_wall.append(tok);
-    calculate();
     this->update();
 }
 void Wallet::mouseMoveEvent(QMouseEvent *event)
 {
-    this->update();
+    detect_pos();
 }
 void Wallet::del_token(const QString &tok)
 {
@@ -58,32 +88,28 @@ double Wallet::get_sum_token(const QString &tok)
     }
     return 0;
 }
-void Wallet::paintEvent(QPaintEvent *event)
+void Wallet::detect_pos()
 {
-    QPainter wall(this);
-    int ws = this->width();
-    int hs = this->height();
-    QPen pen;
-    wall.setPen(pen);
-    pen.setWidth(0);
-
-    QRectF pie (ws / 8, hs / 8, ws - (ws/8) *2, hs - (hs /8)*2);  // Размер Круга графика!
-    int zerox = int(pie.center().x());
-    int zeroy = int(pie.center().y());
-    int xRad = int(pie.width() / 2);
-    int yRad = int(pie.height() / 2);
-    double xscale = 1 / double(xRad);
-    double yscale = 1 / double(yRad);
-    int left_face = zerox - xRad;
-    int right_face = zerox + xRad;
-    int up_face = zeroy - yRad;
-    int down_face = zeroy + yRad;
-    int mposX = this->mapFromGlobal(QCursor::pos()).x();
-    int mposY = this->mapFromGlobal(QCursor::pos()).y();
-    double X_ = (mposX - zerox) * xscale;
-    double Y_ = (zeroy - mposY) * yscale;
+    ws = this->width();
+    hs = this->height();
+    pie = QRectF(ws / 8, hs / 8, ws - (ws/8) *2, hs - (hs /8)*2);  // Размер Круга графика!
+    zerox = int(pie.center().x());
+    zeroy = int(pie.center().y());
+    xRad  = int(pie.width() / 2);
+    yRad  = int(pie.height() / 2);
+    xscale = 1 / double(xRad);
+    yscale = 1 / double(yRad);
+    left_face  = zerox - xRad;
+    right_face = zerox + xRad;
+    up_face    = zeroy - yRad;
+    down_face  = zeroy + yRad;
+    mposX      = this->mapFromGlobal(QCursor::pos()).x();
+    mposY      = this->mapFromGlobal(QCursor::pos()).y();
+    X_      = (mposX - zerox) * xscale;
+    Y_      = (zeroy - mposY) * yscale;
+    sel = -1;
     if(in_diapazon(zerox, left_face, mposX) && in_diapazon(zeroy, up_face, mposY)) // левый верхний угол
-    {        
+    {
         if(qSqrt(pow(X_, 2) + pow(Y_, 2)) <= 1)
         {
             double arctng;
@@ -93,7 +119,7 @@ void Wallet::paintEvent(QPaintEvent *event)
         }
     }
     if(in_diapazon(zerox, right_face, mposX) && in_diapazon(zeroy, up_face, mposY)) // Правый верхний угол
-    {        
+    {
         if(qSqrt(pow(X_, 2) + pow(Y_, 2)) <= 1)
         {
             double arctng;
@@ -103,7 +129,7 @@ void Wallet::paintEvent(QPaintEvent *event)
         }
     }
     if(in_diapazon(zerox, left_face, mposX) && in_diapazon(zeroy, down_face, mposY)) //Левый нижний угол
-    {       
+    {
         if(qSqrt(pow(X_, 2) + pow(Y_, 2)) <= 1)
         {
             double arctng;
@@ -124,27 +150,41 @@ void Wallet::paintEvent(QPaintEvent *event)
 
         }
     }
+    if(sel != -1)
+    {
+        this->update();
+    }
+}
+void Wallet::paintEvent(QPaintEvent *event)
+{
+    detect_pos();
+
     ///////////////////////////////////   Отрисовка Графика по созданым данным
 
+    calculate();
+    QPainter wall(this);
     int rate = 0;
     int rate_= 0;
     for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i++)
     {
         rate_ += int(std::round(i->scal_vol));
+        int piece = 360 - rate;
         if(in_diapazon(rate, rate_, sel))
         {
-            pen.setColor(Qt::red);
-            pen.setWidth(2);
-            wall.setPen(pen);
-            wall.setBrush(Qt::white);
-            wall.drawPie(pie, rate * 16 , int(std::round(i->scal_vol) * 16));
-        }else
+            wall.setBrush(Qt::yellow);
+            wall.drawPie(pie, rate * 16 , piece * 16);
+        }
+        else
         {
-            pen.setWidth(0);
-            pen.setColor(Qt::black);
-            wall.setPen(pen);
-            wall.setBrush(QColor(255,55,150));
-            wall.drawPie(pie, rate * 16 , int(std::round(i->scal_vol) * 16));
+            if(i->targ == true)
+            {
+                wall.setBrush(QColor(250,250,250));
+                wall.drawPie(pie, rate * 16 , piece * 16);
+            }else
+            {
+                wall.setBrush(QColor(250,0,0));
+                wall.drawPie(pie, rate * 16 , piece * 16);
+            }
         }
         rate = rate_;
     }
@@ -170,7 +210,7 @@ void Wallet::calculate()
 
 }
 
-bool Wallet::in_diapazon(int &center, int &face, int &in)
+bool Wallet::in_diapazon(const int &center,const int &face,const int &in)
 {
     if(center > face)
     {
@@ -187,4 +227,5 @@ bool Wallet::in_diapazon(int &center, int &face, int &in)
 Wallet::~Wallet()
 {
     delete ui;
+    qDebug() << "the end";
 }

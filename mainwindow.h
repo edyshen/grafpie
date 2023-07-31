@@ -20,6 +20,8 @@ public:
     void list_tok();
     void del_token();
     void item_click();
+public slots:
+    void selected_item(const QString& name, const bool& targ);
 
 private:
     Ui::MainWindow *ui;
