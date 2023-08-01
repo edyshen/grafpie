@@ -20,6 +20,7 @@ public:
     void list_tok();
     void del_token();
     void item_click();
+    void after_render(QList<wall>* total_tok);
 public slots:
     void selected_item(const QString& name, const bool& targ);
 

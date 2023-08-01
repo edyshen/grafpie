@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <qmath.h>
+#include <QListWidgetItem>
 
 struct wall
 {
@@ -31,6 +32,8 @@ public:
 
     void detect_pos();
     ~Wallet();
+public slots:
+    void itemclick(QListWidgetItem* item);
 
 
 private:
@@ -63,6 +66,7 @@ private:
     QRectF pie;
 signals:
     void target_piece(const QString& name_tok, const bool targ);
+    void after_render(QList<wall>* total_tok);
 
 };
 

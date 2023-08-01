@@ -44,7 +44,23 @@ void Wallet::mouseDoubleClickEvent(QMouseEvent *event)
         this->update();
     }
 }
-
+void Wallet::itemclick(QListWidgetItem* item)
+{
+    if(item->isSelected())
+    {
+        for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i ++)
+        {
+            if(item->text() == i->name) i->targ = true;
+        }
+    }else
+    {
+        for(auto i = l_total_wall.begin(); i != l_total_wall.end(); i ++)
+        {
+            if(item->text() == i->name) i->targ = false;
+        }
+    }
+    this->update();
+}
 void Wallet::add_token(wall &tok)  ////РАБОТАЕТ НЕ ПРАВИЛЬНО! ДОПИЛИТЬ!!! подсчитывает только колличество токенов
 {
     for(QList<wall>::iterator i = l_total_wall.begin(); i < l_total_wall.end(); i++)
@@ -158,9 +174,7 @@ void Wallet::detect_pos()
 void Wallet::paintEvent(QPaintEvent *event)
 {
     detect_pos();
-
     ///////////////////////////////////   Отрисовка Графика по созданым данным
-
     calculate();
     QPainter wall(this);
     int rate = 0;
@@ -188,6 +202,7 @@ void Wallet::paintEvent(QPaintEvent *event)
         }
         rate = rate_;
     }
+    emit after_render(&l_total_wall);
 }
 const QList<wall>* Wallet::take_list_token()
 {
