@@ -160,7 +160,7 @@
        <item>
         <widget class="QPushButton" name="DELET">
          <property name="text">
-          <string>DELET</string>
+          <string>REMOVE</string>
          </property>
         </widget>
        </item>
